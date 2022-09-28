@@ -46,5 +46,5 @@ The best way to use this package is from the jupyter notebook running directly o
 5. Run the following lines of code to unzip the file: 
 ```
 	cd var/lib/jupyter/notebooks 
-	unzip OT2-DOE-otto
+	unzip otto
 ```
