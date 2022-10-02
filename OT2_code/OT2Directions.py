@@ -159,9 +159,11 @@ class experiment():
                 actual_time_taken = end_time - start_time
                 delay_time = action_time - actual_time_taken
                 #assert delay_time > 0, 'Increase the action_time'
-                if delay_time < 0:
+                if delay_time > 0:
+                    protocol.delay(seconds= delay_time)
+                else:
                     print('Increase the action time. OT2 takes longer than action time to perform action')
-                protocol.delay(seconds= delay_time)
+                
 
             elif volume > 0: #Use small pipette 
                 small_pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][stock_solution])
@@ -171,9 +173,10 @@ class experiment():
                 actual_time_taken = end_time - start_time
                 delay_time = action_time - actual_time_taken
                 #assert delay_time > 0, 'Increase the action_time'
-                if delay_time < 0:
+                if delay_time > 0:
+                    protocol.delay(seconds= delay_time)
+                else:
                     print('Increase the action time. OT2 takes longer than action time to perform action')
-                protocol.delay(seconds= delay_time)
             else: #Do nothing
                 protocol.delay(seconds=-action_time*direction_array[action,-1])
                 end_time = time.time()
