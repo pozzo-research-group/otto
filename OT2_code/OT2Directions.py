@@ -130,6 +130,7 @@ class experiment():
                 pipette.air_gap(20)
             pipette.dispense(volume, self.loaded_dict['Destination Wells'][sample_well])
             pipette.blow_out()
+            self.dispense_time = time.time()
             ##Wash the tip to prevent liquid from entering the tip rack
             #pipette.mix(1, 15, self.loaded_dict['Resevoir Wells'][-2])
             #pipette.mix(1, 15, self.loaded_dict['Resevoir Wells'][-3])
@@ -163,8 +164,6 @@ class experiment():
                     protocol.delay(seconds= delay_time)
                 else:
                     print('Increase the action time. OT2 takes longer than action time to perform action')
-                
-
             elif volume > 0: #Use small pipette 
                 small_pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][stock_solution])
                 self.pipette_action(small_pipette, volume, sample_well, stock_solution)
@@ -180,12 +179,77 @@ class experiment():
             else: #Do nothing
                 protocol.delay(seconds=-action_time*direction_array[action,-1])
                 end_time = time.time()
+            
+            data = np.array([volume, sample_well, stock_solution, self.dispense_time]).reshape(1,-1)
+            if action == 0:
+                self.exp_data = data
+            else:
+                self.exp_data = np.vstack((self.exp_data, data))
         protocol.home() 
         for line in protocol.commands(): 
             print(line)
         
         
-        
-        
+    def test(self, exp_data, v_array, t_array, o_array):
+        # Remove Negative Values
+        exp_data = exp_data[(exp_data >= 0).all(1)]
+        # Sort Values first based on Sample number and then by time that they were added 
+        exp_data_new = exp_data[0,:].reshape(1,-1)
+        for sample in range(int(np.max(exp_data[:,1])+1)): #Iterate over the number of samples
+            for row in range(1,exp_data.shape[0]): #Iterate over the whole array
+                if exp_data[row, 1] == sample:
+                    exp_data_new = np.vstack((exp_data_new, exp_data[row,:].reshape(1,-1)))
+        exp_data = exp_data_new.copy()
+        # Calculate Relative time (delay times)
+        delay_times = [0]
+        for row in range(1, exp_data.shape[0]):
+            delay_times.append(exp_data[row-1, -1] - exp_data[row, -1])
+        delay_times = np.array(delay_times)/60
+        for i in range(len(delay_times)):
+            if delay_times[i] > 0:
+                delay_times[i] = 0
+        delay_times = np.abs(delay_times)
+        # Create exp_data array with relative time delays as last column
+        exp_data = np.hstack((exp_data, delay_times.reshape(-1,1)))
+        n_stocks = np.max(exp_data[:,2])
+        n_samples = np.max(exp_data[:,1])
+        assert int((n_stocks + 1)*(n_samples + 1)) == exp_data.shape[0], 'Test will not work since some volumes are 0. New test need to be created for this case'
+
+        # Calculate the average delay time error of the actual delay time and the specified time
+        zeros_loc = np.where(delay_times == 0)
+        delay_times = np.delete(delay_times, zeros_loc)
+        error = delay_times - (t_array*self.action_time/60).flatten() - 1 #t_array times delay time divided by 60
+        average_error = np.mean(np.abs(error))*60 #seconds
+        print('Time: The average time delay error is %.3g seconds' %average_error)
+
+        # Extract the order that the stocks were added to the sample
+        n_stocks = np.max(exp_data[:,2]+1)
+        n_samples = np.max(exp_data[:,1]+1)
+        for sample in range(int(n_samples)):
+            order_of_sample = exp_data[np.where(exp_data[:,1] == sample), 2]
+            if sample == 0:
+                orders = order_of_sample.reshape(1,-1)
+            else:
+                orders = np.vstack((orders, order_of_sample.reshape(1,-1)))
+        # Check if order is equal to specified order
+        if np.sum(np.abs(orders+1 - o_array)) > 0:
+            print('Order: Error, Actual Order is not equal to specified Order')
+        else:
+            print('Order: Check Passed, Actual Order is equal to specified Order')
+
+        # Extract the volumes that the stocks were added to the sample
+        n_stocks = np.max(exp_data[:,2]+1)
+        n_samples = np.max(exp_data[:,1]+1)
+        for sample in range(int(n_samples)):
+            volume_of_sample = exp_data[np.where(exp_data[:,1] == sample), 0]
+            if sample == 0:
+                volumes = volume_of_sample.reshape(1,-1)
+            else:
+                volumes = np.vstack((volumes, volume_of_sample.reshape(1,-1)))
+        # Check if all volumes are equal to specified volums
+        if np.sum(np.abs(volumes - v_array)) > 0:
+            print('Volume: Error, Actual Volume is not equal to specified Volume')
+        else:
+            print('Volume: Check Passed, Actual Volume is equal to specified Volume')
         
     

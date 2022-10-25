@@ -198,7 +198,8 @@ def create_directions(c_array, t_array, o_array):
     for sample in range(o_array.shape[0]): #Iterate over the number of samples
         for stock in range(o_array.shape[1]): #Iterate over the number of stock solutions in one sample
             c_array[sample,  o_array[sample, stock]-1] = copy_c_array[sample, stock]
-            stock_sol_array[sample,  o_array[sample, stock]-1] = stock
+            #stock_sol_array[sample,  o_array[sample, stock]-1] = stock #ORGINAL CODE
+    stock_sol_array = o_array - 1 #NEW CODE IDK WHY THIS WORKS, NEED TO TEST
     best_chart = gchart(c_array, t_array, n_samples = c_array.shape[0])
     direction_array = post_processing(best_chart, stock_sol_array)
     return direction_array
