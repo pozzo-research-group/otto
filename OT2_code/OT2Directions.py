@@ -220,7 +220,7 @@ class experiment():
         delay_times = np.delete(delay_times, zeros_loc)
         error = delay_times - (t_array*self.action_time/60).flatten() - 1 #t_array times delay time divided by 60
         average_error = np.mean(np.abs(error))*60 #seconds
-        print('Time: The average time delay error is %.3g seconds' %average_error)
+        print('Time: The average time delay error is (+/-) %.3g seconds' %average_error)
 
         # Extract the order that the stocks were added to the sample
         n_stocks = np.max(exp_data[:,2]+1)
