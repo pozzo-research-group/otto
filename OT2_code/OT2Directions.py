@@ -189,9 +189,12 @@ class experiment():
         
         
     def test(self, exp_data, v_array, t_array, o_array):
-        # Remove Negative Values
-        exp_data = exp_data[(exp_data >= 0).all(1)]
+        # Make sure that there are no zeros in the v_array 
+        n_stocks = v_array.shape[1]
+        n_samples = v_array.shape[0]
+        #assert int((n_stocks)*(n_samples)) == exp_data.shape[0], 'Test will not work since some volumes are 0. New test need to be created for this case'
         # Sort Values first based on Sample number and then by time that they were added 
+        exp_data = exp_data[(exp_data >= 0).all(1)]
         exp_data_new = exp_data[0,:].reshape(1,-1)
         for sample in range(int(np.max(exp_data[:,1])+1)): #Iterate over the number of samples
             for row in range(1,exp_data.shape[0]): #Iterate over the whole array
@@ -203,23 +206,24 @@ class experiment():
         for row in range(1, exp_data.shape[0]):
             delay_times.append(exp_data[row-1, -1] - exp_data[row, -1])
         delay_times = np.array(delay_times)/60
-        for i in range(len(delay_times)):
-            if delay_times[i] > 0:
-                delay_times[i] = 0
+
+        # Change the relative time of the first stock of each sample to 0
+        stock_0_of_sample = delay_times[::n_stocks]
+        for j in range(len(stock_0_of_sample)):
+            for i in range(len(delay_times)):
+                if delay_times[i] == stock_0_of_sample[j]:
+                    delay_times[i] = 0
+                    break
+
         delay_times = np.abs(delay_times)
         # Create exp_data array with relative time delays as last column
         exp_data = np.hstack((exp_data, delay_times.reshape(-1,1)))
-        n_stocks = np.max(exp_data[:,2])
-        n_samples = np.max(exp_data[:,1])
-        assert int((n_stocks + 1)*(n_samples + 1)) == exp_data.shape[0], 'Test will not work since some volumes are 0. New test need to be created for this case'
-
         # Calculate the average delay time error of the actual delay time and the specified time
         zeros_loc = np.where(delay_times == 0)
         delay_times = np.delete(delay_times, zeros_loc)
         error = delay_times - (t_array*self.action_time/60).flatten() - 1 #t_array times delay time divided by 60
         average_error = np.mean(np.abs(error))*60 #seconds
         print('Time: The average time delay error is (+/-) %.3g seconds' %average_error)
-
         # Extract the order that the stocks were added to the sample
         n_stocks = np.max(exp_data[:,2]+1)
         n_samples = np.max(exp_data[:,1]+1)
