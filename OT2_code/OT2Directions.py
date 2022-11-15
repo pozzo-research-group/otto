@@ -11,8 +11,8 @@ class experiment():
     def __init__(self):
         return 
         
-    def simulate(self):
-        path = r"Samples_and_Protocol/Protocol/protocol.csv"
+    def simulate(self, path):
+        #path = r"Samples_and_Protocol/Protocol/protocol.csv"
         labware_dir_path = r"OT2_code/Custom_Labware"
         self.plan = CreateSamples.get_experiment_plan(path)
         self.custom_labware_dict = OT2Commands.custom_labware_dict(labware_dir_path)
@@ -21,8 +21,8 @@ class experiment():
         self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan)
         return protocol
     
-    def execute(self):
-        path = r"Samples_and_Protocol/Protocol/protocol.csv"
+    def execute(self, path):
+        #path = r"Samples_and_Protocol/Protocol/protocol.csv"
         labware_dir_path = r"OT2_code/Custom_Labware"
         self.plan = CreateSamples.get_experiment_plan(path)
         self.custom_labware_dict = OT2Commands.custom_labware_dict(labware_dir_path)
