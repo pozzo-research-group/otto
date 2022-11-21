@@ -49,11 +49,11 @@ def loading_labware(protocol, experiment_dict):
     dest_labware_objects = object_to_object_list(protocol, dest_labware_names, dest_labware_slots)
     dest_wells = object_list_to_well_list(dest_labware_objects)
     
-    if 'OT2 Source Labwares' in experiment_dict.keys():                                    
-        source_labware_names = experiment_dict['OT2 Source Labwares']
-        source_labware_slots = experiment_dict['OT2 Source Labware Slots']
-        source_labware_objects = object_to_object_list(protocol, source_labware_names, source_labware_slots)
-        source_wells = object_list_to_well_list(source_labware_objects)
+    if 'OT2 Transfer Labwares' in experiment_dict.keys():                                    
+        transfer_labware_names = experiment_dict['OT2 Transfer Labwares']
+        transfer_labware_slots = experiment_dict['OT2 Transfer Labware Slots']
+        transfer_labware_objects = object_to_object_list(protocol, transfer_labware_names, transfer_labware_slots)
+        transfer_wells = object_list_to_well_list(transfer_labware_objects)
     
     if 'OT2 Resevoir Labwares' in experiment_dict.keys():
         resevoir_labware_names = experiment_dict['OT2 Resevoir Labwares']
@@ -109,8 +109,8 @@ def loading_labware(protocol, experiment_dict):
                        'Right Tiprack Wells': right_tiprack_wells
                        }
     
-    if 'OT2 Source Labwares' in experiment_dict.keys():
-        loaded_labware_dict['Source Wells'] = source_wells
+    if 'OT2 Transfer Labwares' in experiment_dict.keys():
+        loaded_labware_dict['Transfer Wells'] = transfer_wells
     
     if 'OT2 Resevoir Labwares' in experiment_dict.keys():
         loaded_labware_dict['Resevoir Wells'] = resevoir_wells
