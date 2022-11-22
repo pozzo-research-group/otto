@@ -9,6 +9,7 @@ import time
 
 class experiment():
     def __init__(self):
+        self.air_gap = 20.0
         return 
         
     def simulate(self, path):
@@ -145,12 +146,13 @@ class experiment():
         
         #This controls what the pipette does at each step
         pipette.aspirate(volume, self.loaded_dict['Stock Wells'][stock_solution])
+        
         if volume < 16:
             pipette.air_gap(4)
-        elif volume <= 20:
+        elif volume <= self.air_gap:
             pass
         else:
-            pipette.air_gap(20)
+            pipette.air_gap(self.air_gap)
         pipette.dispense(volume, self.loaded_dict['Destination Wells'][sample_well])
         pipette.blow_out()
         self.dispense_time = time.time()
@@ -185,7 +187,7 @@ class experiment():
             sample_well = int(direction_array[action, 1] + start_location)
             stock_solution = int(direction_array[action, 2])
             start_time = time.time()
-            if volume > self.small_pipette.max_volume: #Use large pipette
+            if volume > self.small_pipette.max_volume-self.air_gap: #Use large pipette
                 self.large_pipette.pick_up_tip(self.loaded_dict['Large Tiprack'][stock_solution])
                 self.pipette_action(self.large_pipette, volume, sample_well, stock_solution)
                 self.large_pipette.drop_tip(self.loaded_dict['Large Tiprack'][stock_solution].bottom(12))
@@ -219,21 +221,21 @@ class experiment():
             else:
                 self.exp_data = np.vstack((self.exp_data, data))
         
-        self.transfer_samples(protocol, 200, 10)
+#         self.transfer_samples(protocol, 200, 10)
 
         protocol.home() 
         for line in protocol.commands(): 
             print(line)
 
 
-    def transfer_samples(self, protocol, volume, n_samples):
+    def transfer_samples(self, protocol, volume, n_samples, transfer_offset):
         ''' Optional function to trasnfer samples from one labware to another '''
 
         if 'Transfer Wells' in self.loaded_dict.keys():
             self.large_pipette = self.loaded_dict['Large Pipette']
             self.large_pipette.pick_up_tip(self.loaded_dict['Large Tiprack'][-1])
             for sample in range(n_samples):
-                self.large_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(12))
+                self.large_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset))
                 self.large_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
                 self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-1])
                 self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-2])
