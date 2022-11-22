@@ -42,19 +42,35 @@ def loading_labware(protocol, experiment_dict):
     
     protocol.home() 
       
-    # Loading labwares: All concatenated list of wells in order of the provided name/slot
-    
+    # Loading Destination Labware
     dest_labware_names = experiment_dict['OT2 Destination Labwares']
     dest_labware_slots = experiment_dict['OT2 Destination Labware Slots']
-    dest_labware_objects = object_to_object_list(protocol, dest_labware_names, dest_labware_slots)
-    dest_wells = object_list_to_well_list(dest_labware_objects)
+    if 'OT2 Destination Labwares Offset' in experiment_dict.keys():
+        dest_labware_offset = experiment_dict['OT2 Destination Labwares Offset']
+        dest_labware = object_to_object_list(
+        protocol, dest_labware_names, dest_labware_slots,
+        offset = dest_labware_offset)
+    else:
+        dest_labware = object_to_object_list(
+            protocol, dest_labware_names, dest_labware_slots)
+    dest_wells = object_list_to_well_list(dest_labware)
     
+    # Loading Trasnfer Labware (Labware that the destination samples are transfrred to)
     if 'OT2 Transfer Labwares' in experiment_dict.keys():                                    
         transfer_labware_names = experiment_dict['OT2 Transfer Labwares']
         transfer_labware_slots = experiment_dict['OT2 Transfer Labware Slots']
-        transfer_labware_objects = object_to_object_list(protocol, transfer_labware_names, transfer_labware_slots)
-        transfer_wells = object_list_to_well_list(transfer_labware_objects)
-    
+        if 'OT2 Transfer Labwares Offset' in experiment_dict.keys():
+            transfer_labware_offset = experiment_dict['OT2 Transfer Labwares Offset']
+            transfer_labware_objects = object_to_object_list(
+            protocol, transfer_labware_names, transfer_labware_slots,
+        offset = transfer_labware_offset)
+            transfer_wells = object_list_to_well_list(transfer_labware_objects)
+        else:
+            transfer_labware = object_to_object_list(
+                protocol, transfer_labware_names, transfer_labware_slots)
+            transfer_labware_objects = object_to_object_list(protocol, transfer_labware_names, transfer_labware_slots)
+            transfer_wells = object_list_to_well_list(transfer_labware_objects)
+        
     if 'OT2 Resevoir Labwares' in experiment_dict.keys():
         resevoir_labware_names = experiment_dict['OT2 Resevoir Labwares']
         resevoir_labware_slots = experiment_dict['OT2 Resevoir Labware Slots']
@@ -66,8 +82,8 @@ def loading_labware(protocol, experiment_dict):
     stock_labware_objects = object_to_object_list(protocol, stock_labware_names, stock_labware_slots)
     stock_wells = object_list_to_well_list(stock_labware_objects)
     
-    # Loading pipettes and tipracks
     
+    # Loading pipettes and tipracks
     right_tiprack_names = experiment_dict['OT2 Right Tipracks']
     right_tiprack_slots = experiment_dict['OT2 Right Tiprack Slots']
     if 'OT2 Right Tiprack Offset' in experiment_dict.keys():
