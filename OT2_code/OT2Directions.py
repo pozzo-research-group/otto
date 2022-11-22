@@ -237,8 +237,8 @@ class experiment():
             for sample in range(n_samples):
                 self.large_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset))
                 self.large_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
-                self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-1])
-                self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-2])
+                self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
+                self.large_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
             self.large_pipette.drop_tip()
         else:
             print('Error: Transfer wells not specified in protocol')
