@@ -153,14 +153,14 @@ class experiment():
             pass
         else:
             pipette.air_gap(self.air_gap)
-        pipette.dispense(volume, self.loaded_dict['Destination Wells'][sample_well])
+        pipette.dispense(volume, self.loaded_dict['Destination Wells'][sample_well], rate=1.5)
         pipette.blow_out()
         self.dispense_time = time.time()
         
-        pipette.mix(3, 20, self.loaded_dict['Destination Wells'][sample_well])
+        pipette.mix(2, 100, self.loaded_dict['Destination Wells'][sample_well],rate=1.5)
         ##Wash the tip to prevent liquid from entering the tip rack
-        pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-1])
-        pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-2])
+        pipette.mix(2, 150, self.loaded_dict['Resevoir Wells'][-1],rate=2)
+        pipette.mix(2, 150, self.loaded_dict['Resevoir Wells'][-2],rate=2)
 
             
     def perform_directions(self, protocol, direction_array, **kwargs):
@@ -235,8 +235,9 @@ class experiment():
             self.small_pipette = self.loaded_dict['Small Pipette']
             self.small_pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][-1])
             for sample in range(n_samples):
-                self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset))
+                self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset),rate=0.5)
                 self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
+                self.small_pipette.blow_out()
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
             self.small_pipette.drop_tip()
