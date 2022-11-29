@@ -228,27 +228,40 @@ class experiment():
             print(line)
 
 
-    def transfer_samples(self, protocol, volume, n_samples, transfer_offset):
-        ''' Optional function to trasnfer samples from one labware to another '''
+    def transfer_samples(self, protocol, volume, transfer_offset, **kwargs):
+        ''' Optional function to transfer samples from one labware to another '''
 
         if 'Transfer Wells' in self.loaded_dict.keys():
             self.small_pipette = self.loaded_dict['Small Pipette']
             self.small_pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][-1])
+        else:
+            print('Error: Transfer wells not specified in protocol')
+        
+        if 'source_well_index' in kwargs.keys(): # If the source wells is specified by an array of the well index 
+            source_well_index = kwargs['source_well_index']
+            for sample in range(len(source_well_index)):
+                self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][source_well_index[sample]].bottom(transfer_offset),rate=0.5)
+                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
+                self.small_pipette.blow_out()
+                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
+                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
+                self.small_pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
+            self.small_pipette.drop_tip()
+        elif 'n_samples' in kwargs.keys(): # If the source wells index and destination well index is the same
+            n_samples = kwargs['n_samples'] 
             for sample in range(n_samples):
                 self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset),rate=0.5)
                 self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
                 self.small_pipette.blow_out()
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
+                self.small_pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
             self.small_pipette.drop_tip()
-        else:
-            print('Error: Transfer wells not specified in protocol')
-        
+
         protocol.home() 
         for line in protocol.commands(): 
             print(line)
-
-
+    
     def test(self, exp_data, v_array, t_array, o_array):
         ''' Optional function to test if the actual actions correspond to the specified '''
 

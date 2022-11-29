@@ -66,8 +66,6 @@ def loading_labware(protocol, experiment_dict):
         offset = transfer_labware_offset)
             transfer_wells = object_list_to_well_list(transfer_labware_objects)
         else:
-            transfer_labware = object_to_object_list(
-                protocol, transfer_labware_names, transfer_labware_slots)
             transfer_labware_objects = object_to_object_list(protocol, transfer_labware_names, transfer_labware_slots)
             transfer_wells = object_list_to_well_list(transfer_labware_objects)
         
