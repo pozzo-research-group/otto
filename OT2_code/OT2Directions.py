@@ -237,11 +237,16 @@ class experiment():
         else:
             print('Error: Transfer wells not specified in protocol')
         
+        if 'starting_position' in kwargs.keys():
+            starting_position = kwargs['starting_position']
+        else:
+            starting_position = 0
+
         if 'source_well_index' in kwargs.keys(): # If the source wells is specified by an array of the well index 
             source_well_index = kwargs['source_well_index']
             for sample in range(len(source_well_index)):
                 self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][source_well_index[sample]].bottom(transfer_offset),rate=0.5)
-                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
+                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
                 self.small_pipette.blow_out()
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
@@ -251,7 +256,7 @@ class experiment():
             n_samples = kwargs['n_samples'] 
             for sample in range(n_samples):
                 self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset),rate=0.5)
-                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample])
+                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
                 self.small_pipette.blow_out()
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
                 self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
