@@ -161,7 +161,7 @@ class experiment():
         ##Wash the tip to prevent liquid from entering the tip rack
         pipette.mix(2, 150, self.loaded_dict['Resevoir Wells'][-1],rate=2)
         pipette.mix(2, 150, self.loaded_dict['Resevoir Wells'][-2],rate=2)
-
+        pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
             
     def perform_directions(self, protocol, direction_array, **kwargs):
         '''Main function to start running the protocol '''
