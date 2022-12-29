@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from OT2_code import CreateSamples, OT2Commands
+from OT2_code import CreateSamples, OT2Commands, Create_Directions
 from opentrons import simulate, execute, protocol_api
 import random
 import os
@@ -35,7 +35,7 @@ class experiment():
         self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan)
         return protocol 
     
-    def calculate_exp_duration(self, direction_array, **kwargs):
+    def calculate_exp_duration(self, direction_array, print_time=True, **kwargs):
         ''' Function to determine the total time the experiment will take at time = 0'''
 
         self.action_time = kwargs['action_time']
@@ -49,9 +49,11 @@ class experiment():
         total_time = np.sum(np.array(times))*self.action_time
         hours = math.floor(total_time/3600)
         minutes = int(np.round((total_time%3600)/3600*60))
-        print('Experiment will take a total time of:')
-        print(hours, 'hours')
-        print(minutes, 'minutes')
+        if print_time == True:
+            print('Experiment will take a total time of:')
+            print(hours, 'hours')
+            print(minutes, 'minutes')
+        return total_time
         
     def calculate_remaining_exp_duration(self, direction_array, **kwargs):
         ''' Function to determine how long the experiment will take at time = t'''
@@ -229,7 +231,12 @@ class experiment():
 
 
     def transfer_samples(self, protocol, volume, transfer_offset, **kwargs):
-        ''' Optional function to transfer samples from one labware to another '''
+        ''' Optional function to transfer samples from one labware to another
+            inputs:
+            Volume = amount in uL that will be transferred in all specified wells
+            transfer_offset = The height in mm from the bottom of the source transfer well
+            Transfer Wells = an array which specifies the locations fo the wells to be transferred. If this is 
+            not specified, the wells will be transferred one by one'''
 
         if 'Transfer Wells' in self.loaded_dict.keys():
             self.small_pipette = self.loaded_dict['Small Pipette']
@@ -336,5 +343,40 @@ class experiment():
             print('Volume: Check Passed, Actual Volume is equal to specified Volume')
 
     
-        
+    def change_order(self, order_x, v_array, t_array, o_array):
+        ''' Function to shuffle the order of the input arrays based on order_x'''
+
+        order_lst = []
+        for i in range(len(order_x)):
+            order_lst.append(int(order_x[i]))
+        order_x = np.array(order_lst)
+        v_array = v_array[order_x, :]
+        t_array = t_array[order_x, :]
+        o_array = o_array[order_x, :]
+        direction_array = Create_Directions.create_directions(v_array, t_array, o_array)
+        return direction_array, v_array, t_array, o_array
+
+
+    def optimize(self, v_array, t_array, o_array):
+        '''Calculates the direction_array for shuffled versions of the input arrays and returns the order that
+           takes the least amount of time to complete '''
+
+        all_times = []
+        for j in range(10):
+            order_x = np.linspace(0, v_array.shape[0]-1, v_array.shape[0])
+            np.random.shuffle(order_x)
+            direction_array, a, b, c = self.change_order(order_x, v_array, t_array, o_array)
+            total_time = self.calculate_exp_duration(direction_array, print_time = False, action_time = 60)
+            all_times.append(total_time)
+            if j == 0:
+                all_orders = order_x.reshape(1,-1)
+            else:
+                all_orders = np.vstack((all_orders, order_x.reshape(1,-1)))
+        all_times = np.array(all_times).reshape(-1,1)
+        order_times = np.hstack((all_orders, all_times))
+        sorted_array = order_times[np.argsort(order_times[:, -1])]
+        best_order = sorted_array[0,:-1]
+        best_time = sorted_array[0,-1]
+        return best_order, best_time
+    
     
