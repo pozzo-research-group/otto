@@ -10,7 +10,7 @@ import time
 class experiment():
     def __init__(self):
         self.air_gap = 20.0
-        self.well_order = 'column'
+        self.well_order = 'rows'
         return 
         
     def simulate(self, path):
