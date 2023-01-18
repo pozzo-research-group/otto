@@ -10,6 +10,7 @@ import time
 class experiment():
     def __init__(self):
         self.air_gap = 20.0
+        self.well_order = 'column'
         return 
         
     def simulate(self, path):
@@ -21,7 +22,7 @@ class experiment():
         self.custom_labware_dict = OT2Commands.custom_labware_dict(labware_dir_path)
         protocol = simulate.get_protocol_api('2.8', extra_labware=self.custom_labware_dict)
         self.protocol2 = simulate.get_protocol_api('2.8', extra_labware=self.custom_labware_dict)
-        self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan)
+        self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan, well_order=self.well_order)
         return protocol
     
     def execute(self, path):
@@ -32,7 +33,7 @@ class experiment():
         self.custom_labware_dict = OT2Commands.custom_labware_dict(labware_dir_path)
         protocol = execute.get_protocol_api('2.8', extra_labware=self.custom_labware_dict)
         self.protocol2 = execute.get_protocol_api('2.8', extra_labware=self.custom_labware_dict)
-        self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan)
+        self.loaded_dict = OT2Commands.loading_labware(protocol, self.plan, well_order=self.well_order)
         return protocol 
     
     def calculate_exp_duration(self, direction_array, print_time=True, **kwargs):
