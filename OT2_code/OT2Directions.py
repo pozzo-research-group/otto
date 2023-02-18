@@ -239,9 +239,19 @@ class experiment():
             Transfer Wells = an array which specifies the locations fo the wells to be transferred. If this is 
             not specified, the wells will be transferred one by one'''
 
+        self.small_pipette = self.loaded_dict['Small Pipette']
+        self.small_tiprack = self.loaded_dict['Small Tiprack']
+        self.large_pipette = self.loaded_dict['Large Pipette']
+        self.large_tiprack = self.loaded_dict['Large Tiprack']
+        
         if 'Transfer Wells' in self.loaded_dict.keys():
-            self.small_pipette = self.loaded_dict['Small Pipette']
-            self.small_pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][-1])
+            if volume > self.small_pipette.max_volume: # Use Large Pipette
+                self.pipette = self.loaded_dict['Large Pipette']
+                self.pipette.pick_up_tip(self.loaded_dict['Large Tiprack'][-1])
+            else:
+                self.pipette = self.loaded_dict['Small Pipette']
+                self.pipette.pick_up_tip(self.loaded_dict['Small Tiprack'][-1])
+                
         else:
             print('Error: Transfer wells not specified in protocol')
         
@@ -253,23 +263,23 @@ class experiment():
         if 'source_well_index' in kwargs.keys(): # If the source wells is specified by an array of the well index 
             source_well_index = kwargs['source_well_index']
             for sample in range(len(source_well_index)):
-                self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][source_well_index[sample]].bottom(transfer_offset),rate=0.5)
-                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
-                self.small_pipette.blow_out()
-                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
-                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
-                self.small_pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
-            self.small_pipette.drop_tip()
+                self.pipette.aspirate(volume, self.loaded_dict['Destination Wells'][source_well_index[sample]].bottom(transfer_offset),rate=0.5)
+                self.pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
+                self.pipette.blow_out()
+                self.pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
+                self.pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
+                self.pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
+            self.pipette.drop_tip()
         elif 'n_samples' in kwargs.keys(): # If the source wells index and destination well index is the same
             n_samples = kwargs['n_samples'] 
             for sample in range(n_samples):
-                self.small_pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset),rate=0.5)
-                self.small_pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
-                self.small_pipette.blow_out()
-                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
-                self.small_pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
-                self.small_pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
-            self.small_pipette.drop_tip()
+                self.pipette.aspirate(volume, self.loaded_dict['Destination Wells'][sample].bottom(transfer_offset),rate=0.5)
+                self.pipette.dispense(volume, self.loaded_dict['Transfer Wells'][sample + starting_position])
+                self.pipette.blow_out()
+                self.pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-3])
+                self.pipette.mix(2, 20, self.loaded_dict['Resevoir Wells'][-4])
+                self.pipette.blow_out(self.loaded_dict['Resevoir Wells'][-5])
+            self.pipette.drop_tip()
 
         protocol.home() 
         for line in protocol.commands(): 
