@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "otto"
+type: software
+authors:
+  - name: "Pozzo Research Group, University of Washington"
+repository-code: "https://github.com/pozzo-research-group/otto"
+url: "https://pozzorg.com"
+preferred-citation:
+  type: article
+  title: "Anisotropic Gold Nanomaterial Synthesis Using Peptide Facet Specificity and Timed Intervention"
+  authors:
+    - family-names: "Lachowski"
+      given-names: "Kacper J."
+    - family-names: "Chiang"
+      given-names: "Huat Thart"
+    - family-names: "Torkelson"
+      given-names: "Kaylyn"
+    - family-names: "Zhou"
+      given-names: "Wenhao"
+    - family-names: "Zhang"
+      given-names: "Shuai"
+    - family-names: "Pfaendtner"
+      given-names: "Jim"
+    - family-names: "Pozzo"
+      given-names: "Lilo D."
+  journal: "Langmuir"
+  year: 2023
+  volume: "39"
+  issue: "45"
+  start: "15878"
+  end: "15888"
+  doi: "10.1021/acs.langmuir.3c01577"
