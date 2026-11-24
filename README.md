@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24484808.svg)](https://doi.org/10.5281/zenodo.24484808)
+
 ## Description 
 This package is designed for the high-throughput chemical synthesis of materials where the time and order that the reagents are added have an effect on the material's final structure or property. Given the volumes of each stock solution to make a sample, the delay times between adding each stock solution, and the order of addition of the stocks, this package will determine the optimal schedule to synthesize the samples in the shortest amount of time. The schedule can then be performed using an Opentrons OT2 liquid handling robot. 
 
